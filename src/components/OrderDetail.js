@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Descriptions, List, Button } from "antd";
+import { Descriptions, List, Button, message } from "antd";
 
-export const OrderDetail = ({ orderData }) => {
+export const OrderDetail = ({ orderData, refresh }) => {
   const [order, setOrder] = useState(null);
   const [buttons, setButtons] = useState(false);
 
@@ -13,35 +13,51 @@ export const OrderDetail = ({ orderData }) => {
   }, [orderData]);
 
   const updateOrder = async (id, status) => {
-    if (status == "processed") {
-      const payload = {
-        status: "processed",
-      };
-      const response = await fetch(`http://localhost:3000/orders`, {
-        method: "PATCH",
-        body: JSON.stringify(payload),
-      });
-      return response.json();
-    } else if (status == "open") {
+    if (status === "processed") {
       const payload = {
         status: "open",
       };
-      const response = await fetch(`http://localhost:3000/orders`, {
+      const response = await fetch(`http://localhost:3000/orders/${id}`, {
         method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+      return response.json();
+    } else if (status === "open") {
+      const payload = {
+        status: "processed",
+      };
+      const response = await fetch(`http://localhost:3000/orders/${id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(payload),
       });
       return response.json();
     }
   };
   const handleCLick = async () => {
-    const order = await updateOrder(order.id, order.status).then((data) => {
-      return data;
-    });
+    const modifiedOrder = await updateOrder(order.id, order.status).then(
+      (data) => {
+        return data;
+      }
+    );
+    if (modifiedOrder.id) {
+      message.success("orden correctamente modificada");
+      refresh(modifiedOrder.id);
+    } else if (modifiedOrder.message) {
+      message.error(message);
+    }
+
+    console.log(modifiedOrder, "----");
   };
 
   return (
     <div>
-      {order && (
+      {order !== null ? (
         <Descriptions title="Order Info">
           <Descriptions.Item label="UserName">
             {order.user.name}
@@ -80,13 +96,13 @@ export const OrderDetail = ({ orderData }) => {
             })}
           </Descriptions.Item>
         </Descriptions>
-      )}
-      {buttons && order.status == "open" ? (
+      ) : null}
+      {buttons && order !== null && order.status == "open" ? (
         <Button type="primary" onClick={handleCLick}>
           Aceptar Orden
         </Button>
       ) : null}
-      {buttons && order.status == "processed" ? (
+      {buttons && order !== null && order.status == "processed" ? (
         <Button type="danger" danger onClick={handleCLick}>
           {" "}
           Cancelar Orden

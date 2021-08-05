@@ -17,13 +17,20 @@ import {
 } from "@ant-design/icons";
 import { Login } from "./components/Login";
 import { Order } from "./components/Order";
+import { useEffect, useState } from "react";
 
 const { SubMenu } = Menu;
 const { Header, Content, Footer, Sider } = Layout;
 
 function App() {
-  const usuario = false;
+  const [usuario, setUsuario] = useState(false);
   const history = createBrowserHistory();
+  useEffect(() => {
+    const user = localStorage.getItem("token");
+    if (user.length > 0) {
+      setUsuario(true);
+    }
+  }, []);
   return (
     <Layout>
       <Router history={history}>
@@ -68,11 +75,6 @@ function App() {
                 <SubMenu key="sub1" icon={<UserOutlined />} title="usuarios">
                   <Menu.Item key="1">
                     <a>Administrador</a>
-                  </Menu.Item>
-                  <Menu.Item key="2">vendedor</Menu.Item>
-
-                  <Menu.Item key="3">
-                    <a>comprador</a>
                   </Menu.Item>
                 </SubMenu>
                 <SubMenu key="sub2" icon={<LaptopOutlined />} title="Ordenes">

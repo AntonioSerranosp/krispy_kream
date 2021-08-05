@@ -53,7 +53,7 @@ export const Login = () => {
       localStorage.setItem("token", loginUser.token);
       localStorage.setItem("token-init-date", new Date().getTime());
       localStorage.setItem("role", loginUser.role);
-      localStorage.setItem("role", loginUser.email);
+      localStorage.setItem("email", loginUser.email);
     }
     handleOk();
   };
